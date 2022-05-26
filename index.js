@@ -3,6 +3,7 @@ const inquirer = require('inquirer');
 const { title } = require('process');
 const Employee = require('./lib/classes');
 const getQuestions = require('./lib/questions');
+const generateHTML = require('./src/generateHTML');
 
 let role = '';
 let team = [];
@@ -39,7 +40,7 @@ function addEmployee() {
     inquirer.prompt(newEmployee).then((data) => {
         let newEmployeeRole = data.role;
         if (newEmployeeRole == 'Make Webpage') {
-            console.log(team);
+            writeToFile('./dist/index.html', generateHTML(team))
          }else {
              inquirer.prompt(getQuestions(newEmployeeRole))
              .then((data) => {
@@ -64,6 +65,15 @@ function displayTeam() {
 function roleCount(id) {
     let count = team.filter((Employee) => Employee.role == id);
     return count.length;
+}
+
+function writeToFile(fileName, data) {
+    fs.writeFile(fileName, data, (err) => {
+        if (err) {
+            return console.log(err);
+        }
+        console.log('Your new team file is ready!');
+    });
 }
 
 init();
