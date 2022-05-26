@@ -1,69 +1,69 @@
 const fs = require('fs');
 const inquirer = require('inquirer');
 const { title } = require('process');
+const Employee = require('./lib/classes');
+const getQuestions = require('./lib/questions');
 
-// init questions (manager questions)
+let role = '';
+let team = [];
+
+// init questions
 const initQuestions = [
     {
         type: 'input',
         name: 'teamName',
-        message: 'What is the name of your team?'
-    },
-    {
-        type: 'input',
-        name: 'managerName',
-        message: 'What is the name of your teams manager?'
-    },
-    {
-        type: 'input',
-        name: 'managerId',
-        message: 'What is your team managers employee ID?'
-    },
-    {
-        type: 'input',
-        name: 'managerEmail',
-        message: 'What is your team managers email address?'
-    },
-    {
-        type: 'number',
-        name: 'managerOffice',
-        message: 'What is the number of your team managers office?'
+        message: `What is the name of your team?`
     },
 ]
+// new employee questions
+const newEmployee = [
+    {
+        type: 'list',
+        name: 'role',
+        message: 'Select the type of employee you would like to create next:',
+        choices: ['Manager', 'Employee', 'Engineer', 'Intern', 'Make Webpage'],
+    }
+]
+// function to start the program running
+function init() {
+    inquirer.prompt(initQuestions.concat(getQuestions('Manager')))
+        .then((data) => {
+            team.push(new Employee(data, 'Manager'));
+            displayTeam(team);
+        }).then(() => {
+            addEmployee();
+        })
+}
+// loop function to add an employee
+function addEmployee() {
+    inquirer.prompt(newEmployee).then((data) => {
+        let newEmployeeRole = data.role;
+        if (newEmployeeRole == 'Make Webpage') {
+            console.log(team);
+         }else {
+             inquirer.prompt(getQuestions(newEmployeeRole))
+             .then((data) => {
+                 team.push(new Employee(data, newEmployeeRole, team[0].teamName));
+                 displayTeam(team);
+                 addEmployee();
+             }) 
+         }
+    })
+}
+// show the current team size
+function displayTeam() {
+    console.log("==============================================")
+    console.log(`Your team ${team[0].teamName()} currently has:`)
+    console.log(`${roleCount('Manager')} Managers`);
+    console.log(`${roleCount('Employee')} Employees`);
+    console.log(`${roleCount('Engineer')} Engineers`);
+    console.log(`${roleCount('Intern')} Inters`);
+    console.log("==============================================")
+}
 
-// employee questions
-const employeeQuestions = [
-    {
-        type: 'input',
-        name: 'employeeName',
-        message: 'What is the name of the new employee?'
-    },
-    {
-        type: 'input',
-        name: 'employeeID',
-        message: 'What is the ID of the new employee?'
-    },
-    {
-        type: 'input',
-        name: 'employeeEmail',
-        message: 'What is the email of the new employee?'
-    },
-]
+function roleCount(id) {
+    let count = team.filter((Employee) => Employee.role == id);
+    return count.length;
+}
 
-// engineer questions
-const engineerQuestions = [
-    {
-        type: 'input',
-        name: 'employeeGitHub',
-        message: 'What is the GitHub username of the new employee?'
-    },
-]
-
-// intern questions
-const internQuestions = [
-    {
-        type: 'input',
-        name: 'employeeSchool',
-        message: 'What school does the employee attend?'
-    },
-]
+init();
