@@ -45,6 +45,7 @@ function addEmployee() {
              inquirer.prompt(getQuestions(newEmployeeRole))
              .then((data) => {
                  team.push(new Employee(data, newEmployeeRole, team[0].teamName));
+                 console.log(team);
                  displayTeam(team);
                  addEmployee();
              }) 
