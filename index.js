@@ -4,6 +4,7 @@ const { title } = require('process');
 const Employee = require('./lib/classes');
 const getQuestions = require('./lib/questions');
 const generateHTML = require('./src/generateHTML');
+const sampleData = require('./lib/sampleData');
 
 let role = '';
 let team = [];
@@ -22,7 +23,7 @@ const newEmployee = [
         type: 'list',
         name: 'role',
         message: 'Select the type of employee you would like to create next:',
-        choices: ['Manager', 'Employee', 'Engineer', 'Intern', 'Make Webpage'],
+        choices: ['Manager', 'Employee', 'Engineer', 'Intern', 'Make Webpage', 'DEV OPTION: Fill with sample data'],
     }
 ]
 // function to start the program running
@@ -41,11 +42,18 @@ function addEmployee() {
         let newEmployeeRole = data.role;
         if (newEmployeeRole == 'Make Webpage') {
             writeToFile('./dist/index.html', generateHTML(team))
+         }else if (newEmployeeRole == 'DEV OPTION: Fill with sample data') {
+            for (let i = 0; i < sampleData.length; i++) {
+                for (let x = 1; x < sampleData[i].length; x++) {
+                    team.push(new Employee(sampleData[i][x], sampleData[i][0], team[0].teamName));
+                    displayTeam(team);
+                }
+            }
+            addEmployee();
          }else {
              inquirer.prompt(getQuestions(newEmployeeRole))
              .then((data) => {
                  team.push(new Employee(data, newEmployeeRole, team[0].teamName));
-                 console.log(team);
                  displayTeam(team);
                  addEmployee();
              }) 
